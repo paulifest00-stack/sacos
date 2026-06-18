@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Etiquetas Paulifest</title>
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Geist+Mono:wght@500;600&display=swap');
+
+:root{
+  --bg:#f4f3ef;--surface:#ffffff;--ink:#1c1b18;--muted:#6f6c64;
+  --line:#e6e3db;--accent:#c2410c;--accent-soft:#fdf0e8;--radius:18px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{-webkit-text-size-adjust:100%;}
+body{
+  font-family:'Outfit',sans-serif;
+  background:radial-gradient(120% 80% at 100% 0%, #ece9e0 0%, transparent 55%),var(--bg);
+  color:var(--ink);min-height:100dvh;padding:20px 16px 60px;line-height:1.5;
+}
+.wrap{max-width:760px;margin:0 auto;}
+header{margin-bottom:28px;}
+.tag{display:inline-block;font-size:.72rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);padding:5px 11px;border-radius:999px;margin-bottom:14px;}
+header h1{font-size:clamp(1.7rem,6vw,2.4rem);font-weight:800;letter-spacing:-.03em;line-height:1.05;}
+header p{color:var(--muted);margin-top:8px;font-size:.95rem;max-width:48ch;}
+section{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:22px;margin-bottom:18px;box-shadow:0 18px 40px -28px rgba(40,30,15,.45);}
+section h2{font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:16px;}
+.catalogo{display:grid;grid-template-columns:1fr;gap:10px;}
+@media(min-width:560px){.catalogo{grid-template-columns:1fr 1fr;}}
+.prod{text-align:left;width:100%;cursor:pointer;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;transition:transform .25s cubic-bezier(.16,1,.3,1),border-color .2s,box-shadow .25s;display:flex;justify-content:space-between;align-items:center;gap:12px;font-family:inherit;}
+.prod:hover{transform:translateY(-2px);border-color:var(--accent);box-shadow:0 12px 24px -16px rgba(194,65,12,.4);}
+.prod:active{transform:translateY(0) scale(.99);}
+.prod:focus-visible{outline:none;box-shadow:0 0 0 3px var(--accent-soft),0 0 0 4px var(--accent);}
+.prod.sel{border-color:var(--accent);background:var(--accent-soft);}
+.prod .info .nome{font-weight:600;font-size:.92rem;}
+.prod .info .cod{color:var(--muted);font-size:.78rem;font-family:'Geist Mono',monospace;margin-top:2px;}
+.prod .preco{font-family:'Geist Mono',monospace;font-weight:600;color:var(--accent);white-space:nowrap;font-size:.92rem;}
+.grid-form{display:grid;grid-template-columns:1fr;gap:14px;}
+@media(min-width:560px){.grid-form{grid-template-columns:1fr 1fr;}}
+.field{display:flex;flex-direction:column;gap:6px;}
+.field label{font-size:.78rem;font-weight:600;color:var(--muted);}
+.field input{font-family:inherit;font-size:1rem;padding:12px 14px;background:var(--bg);border:1px solid var(--line);border-radius:11px;color:var(--ink);transition:border-color .2s,box-shadow .2s;}
+.field input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+.field.mono input{font-family:'Geist Mono',monospace;}
+.btns{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px;}
+.btn{font-family:inherit;font-weight:600;font-size:.95rem;border-radius:12px;padding:13px 20px;cursor:pointer;border:1px solid transparent;flex:1;min-width:140px;transition:transform .2s cubic-bezier(.16,1,.3,1),box-shadow .25s,background .2s;}
+.btn:active{transform:translateY(1px);}
+.btn:focus-visible{outline:none;box-shadow:0 0 0 3px var(--accent-soft),0 0 0 4px var(--accent);}
+.btn-primary{background:var(--accent);color:#fff;}
+.btn-primary:hover{box-shadow:0 12px 26px -12px rgba(194,65,12,.6);transform:translateY(-2px);}
+.btn-ghost{background:transparent;border-color:var(--line);color:var(--ink);}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent);}
+.hint{margin-top:14px;font-size:.85rem;color:var(--muted);}
+.hint b{color:var(--accent);font-family:'Geist Mono',monospace;}
+.preview-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px;flex-wrap:wrap;gap:8px;}
+.preview-head h2{margin:0;}
+.preview-head .meta{font-size:.82rem;color:var(--muted);font-family:'Geist Mono',monospace;}
+
+@media screen{
+  #folha{background:#fff;width:100%;max-width:21cm;margin:0 auto;border:1px solid var(--line);border-radius:8px;overflow:hidden;display:flex;flex-wrap:wrap;}
+  #folha:empty{display:none;}
+}
+
+/* ===== ETIQUETA =====
+   3 colunas x 7cm = 21cm (A4) | altura 2,1cm -> 14 fileiras
+   conteudo EMPILHADO e alinhado levemente a ESQUERDA */
+.etq{
+  width:7cm;height:2.1cm;
+  display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:.6mm;
+  box-sizing:border-box;overflow:hidden;padding:1mm 2mm 1mm 4mm;
+  border-right:.25pt dashed #c9c5bc;border-bottom:.25pt dashed #c9c5bc;
+}
+.etq .n{
+  font-family:'Outfit',Arial,sans-serif;font-weight:700;font-size:8pt;line-height:1;color:#000;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60mm;text-align:left;
+}
+.etq .p{font-family:'Geist Mono','Courier New',monospace;font-weight:600;font-size:9pt;color:#000;line-height:1;text-align:left;}
+.etq .bc{display:flex;align-items:center;justify-content:flex-start;line-height:0;}
+.etq .bc svg{height:auto;width:auto;max-width:60mm;}
+
+@media print{
+  body{background:#fff;padding:0;}
+  body *{visibility:hidden;}
+  #folha,#folha *{visibility:visible;}
+  #folha{position:absolute;left:0;top:0;width:21cm;margin:0;border:none;border-radius:0;display:flex;flex-wrap:wrap;}
+  .etq{border-right:.25pt dashed #999;border-bottom:.25pt dashed #999;}
+  @page{size:A4;margin:0;}
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header>
+    <span class="tag">Paulifest · Bertioga</span>
+    <h1>Gerador de etiquetas</h1>
+    <p>Etiqueta 7 × 2,1 cm, conteúdo empilhado e alinhado à esquerda: nome, preço e código de barras embaixo. 3 colunas × 14 linhas = 42 por folha A4.</p>
+  </header>
+
+  <section>
+    <h2>Catálogo</h2>
+    <div class="catalogo" id="catalogo"></div>
+  </section>
+
+  <section>
+    <h2>Dados da etiqueta</h2>
+    <div class="grid-form">
+      <div class="field"><label for="nome">Nome / tamanho</label><input id="nome" placeholder="SACO 45X57"></div>
+      <div class="field mono"><label for="codigo">Código interno</label><input id="codigo" placeholder="018397"></div>
+      <div class="field mono"><label for="preco">Preço (R$)</label><input id="preco" placeholder="2,99"></div>
+      <div class="field mono"><label for="qtd">Qtd. de etiquetas</label><input id="qtd" type="number" min="1" value="42"></div>
+    </div>
+    <div class="btns">
+      <button class="btn btn-primary" id="bGerar">Gerar folha</button>
+      <button class="btn btn-ghost" id="bFolha">Encher folha (42)</button>
+      <button class="btn btn-ghost" id="bImprimir">Imprimir</button>
+    </div>
+    <p class="hint">Cabem <b>42</b> etiquetas por folha (3 × 14). Na impressão: margens em <b>Nenhuma</b> e sem cabeçalho/rodapé.</p>
+  </section>
+
+  <section id="previewBox" style="display:none;">
+    <div class="preview-head">
+      <h2>Pré-visualização</h2>
+      <span class="meta" id="resumo"></span>
+    </div>
+    <div id="folha"></div>
+  </section>
+</main>
+
+<script>
+const produtos = [
+  {nome:"SACO 45X57",codigo:"018397",preco:"2,99"},
+  {nome:"SACO 45X60",codigo:"003314",preco:"2,99"},
+  {nome:"SACO 50X70",codigo:"012805",preco:"2,99"},
+  {nome:"SACO 52X87",codigo:"014374",preco:"3,50"},
+  {nome:"SACO 60X80",codigo:"002778",preco:"3,50"},
+  {nome:"SACO 60X87",codigo:"014375",preco:"3,50"},
+  {nome:"SACO 80X87",codigo:"018479",preco:"4,90"},
+  {nome:"SACO 80X90",codigo:"002779",preco:"4,90"},
+  {nome:"SACO PRESENTE 25X37",codigo:"014939",preco:"1,50"},
+  {nome:"SACO PRESENTE 30X44",codigo:"014942",preco:"2,00"},
+  {nome:"SACO PRESENTE 35X54",codigo:"014941",preco:"2,50"},
+  {nome:"SACO PRESENTE 45X30",codigo:"018562",preco:"2,00"},
+  {nome:"SACO PRESENTE 45X59",codigo:"014940",preco:"3,80"},
+];
+const $=s=>document.querySelector(s);
+const cat=$('#catalogo'),nome=$('#nome'),codigo=$('#codigo'),preco=$('#preco'),qtd=$('#qtd');
+const folha=$('#folha'),box=$('#previewBox'),resumo=$('#resumo');
+const POR_FOLHA=42;
+
+produtos.forEach(p=>{
+  const b=document.createElement('button');
+  b.className='prod';
+  b.innerHTML=`<span class="info"><span class="nome">${p.nome}</span><span class="cod">Cod. ${p.codigo}</span></span><span class="preco">R$ ${p.preco}</span>`;
+  b.onclick=()=>{document.querySelectorAll('.prod').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');nome.value=p.nome;codigo.value=p.codigo;preco.value=p.preco;};
+  cat.appendChild(b);
+});
+
+function gerar(){
+  if(!codigo.value.trim()){alert('Preencha o código interno do produto.');codigo.focus();return;}
+  const total=Math.max(1,parseInt(qtd.value)||1);
+  folha.innerHTML='';
+  for(let i=0;i<total;i++){
+    const e=document.createElement('div');
+    e.className='etq';
+    e.innerHTML=`<span class="n">${nome.value||'-'}</span><span class="p">R$ ${preco.value||'--'}</span><div class="bc"><svg></svg></div>`;
+    folha.appendChild(e);
+    JsBarcode(e.querySelector('svg'),codigo.value.trim(),{
+      format:"CODE128",displayValue:true,fontSize:8,font:"Geist Mono",
+      height:22,width:1,margin:0,textMargin:1
+    });
+  }
+  const folhas=Math.ceil(total/POR_FOLHA);
+  resumo.textContent=`${total} etiqueta(s) · ${folhas} folha(s) A4`;
+  box.style.display='block';
+  box.scrollIntoView({behavior:'smooth',block:'start'});
+}
+$('#bGerar').onclick=gerar;
+$('#bFolha').onclick=()=>{qtd.value=POR_FOLHA;gerar();};
+$('#bImprimir').onclick=()=>{if(!folha.children.length)gerar();window.print();};
+</script>
+</body>
+</html>
